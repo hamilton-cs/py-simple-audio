@@ -8,13 +8,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-	include:
-	  - os: macos-latest
-	    python: 310
-	    platform_id: macosx_arm64
-	  - os: macos-latest
-	    python: 311
-	    platform_id: macosx_arm64
+        include:
+          - os: macos-latest
+            python: 310
+            platform_id: macosx_arm64
+          - os: macos-latest
+            python: 311
+            platform_id: macosx_arm64
 
     steps:
       - uses: actions/checkout@v4
