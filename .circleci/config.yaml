@@ -1,0 +1,163 @@
+# CI Pipeline
+
+version: 2.1
+
+jobs:
+  # --- macOS build/test ---
+  build-and-test-macos:
+    parameters:
+      python-version:
+        type: string
+      apple-chip:
+        type: string
+        default: "m1.medium.gen1"
+    macos:
+      xcode: 26.0
+    resource_class: macos.<< parameters.apple-chip >>
+    steps:
+      - checkout
+
+      - run:
+          name: Install Python << parameters.python-version >>
+          command: |
+            brew install python@<< parameters.python-version >> || true
+            echo 'export PATH="/opt/homebrew/opt/python@<< parameters.python-version >>/bin:$PATH"' >> $BASH_ENV
+
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m pip install --upgrade pip setuptools wheel
+            if [ -f requirements.txt ]; then
+              python3 -m pip install -r requirements.txt
+            fi
+            python3 -m pip install -e .
+
+      - run:
+          name: Run Unit Tests
+          command: python3 -m unittest discover
+
+
+  # --- Linux build/test ---
+  build-and-test-linux:
+    parameters:
+      python-version:
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python-version >>
+    resource_class: medium
+    steps:
+      - checkout
+
+      - run:
+          name: Install ALSA dev libraries
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libasound2-dev
+
+      - run:
+          name: Install Dependencies
+          command: |
+            python -m pip install --upgrade pip setuptools wheel
+            if [ -f requirements.txt ]; then
+              python -m pip install -r requirements.txt
+            fi
+            python -m pip install -e .
+
+      - run:
+          name: Run Unit Tests
+          command: python -m unittest discover
+
+
+  # --- Windows build/test ---
+  build-and-test-windows:
+    parameters:
+      python-version:
+        type: string
+    machine:
+      image: windows-server-2022-gui:current
+    resource_class: windows.medium
+    shell: powershell.exe
+    steps:
+      - checkout
+
+      - run:
+          name: Set up Python << parameters.python-version >>
+          command: |
+            choco install python --version=<< parameters.python-version >> -y
+            refreshenv
+            python -m pip install --upgrade pip setuptools wheel
+
+      - run:
+          name: Install Dependencies
+          command: |
+            if (Test-Path "requirements.txt") {
+              python -m pip install -r requirements.txt
+            }
+            python -m pip install -e .
+
+      - run:
+          name: Run Unit Tests
+          command: python -m unittest discover
+
+
+  # --- Deploy to TestPyPI job ---
+  deploy-to-testpypi:
+    docker:
+      - image: cimg/python:3.12  # stable version
+    resource_class: medium
+    steps:
+      - checkout
+
+      - run:
+          name: Install ALSA dev libraries
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libasound2-dev
+
+      - run:
+          name: Install packaging tools
+          command: |
+            python -m pip install --upgrade pip build twine
+
+      - run:
+          name: Build distribution files
+          command: |
+            python3 setup.py sdist
+
+      - run:
+          name: Upload to PyPI
+          command: |
+            twine upload --verbose dist/* \
+              -u "${PYPI_USERNAME}" \
+              -p "${PYPI_PASSWORD}"
+
+
+workflows:
+  version: 2
+  build-test-workflow:
+    jobs:
+      - build-and-test-macos:
+          matrix:
+            parameters:
+              python-version: ["3.10", "3.11", "3.12"]
+              apple-chip:
+                - "m1.medium.gen1"
+
+      - build-and-test-linux:
+          matrix:
+            parameters:
+              python-version: ["3.10", "3.11", "3.12"]
+
+      - build-and-test-windows:
+          matrix:
+            parameters:
+              python-version: ["3.10", "3.11", "3.12"]
+
+      - deploy-to-testpypi:
+          requires:
+            - build-and-test-linux
+            - build-and-test-macos
+            - build-and-test-windows
+          filters:
+            branches:
+              only: main
