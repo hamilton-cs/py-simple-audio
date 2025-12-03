@@ -45,7 +45,7 @@ jobs:
   # --- Build Wheels: macOS ---
   build-wheels-macos:
     macos:
-      xcode: 15.0 # Newer Xcode for better compatibility
+      xcode: 26.0 # Newer Xcode for better compatibility
     resource_class: macos.m1.medium.gen1
     environment:
       CIBW_BUILD: "cp310-* cp311-* cp312-*"
