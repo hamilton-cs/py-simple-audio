@@ -134,7 +134,6 @@ workflows:
       - build-wheels-windows
       - deploy-to-pypi:
           requires:
-            - build-wheels-linux
             - build-wheels-macos
             - build-wheels-windows
           filters:
