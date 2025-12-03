@@ -1,12 +1,12 @@
 .. _function-checks-ref:
 
-:mod:`simpleaudio.functionchecks`
+:mod:`simpleaudio-hamilton-cs.functionchecks`
 =================================
 
-.. module:: simpleaudio.functionchecks
+.. module:: simpleaudio-hamilton-cs.functionchecks
    :synopsis: Provides tests of functionality by playing various test audio clips.
 
-The :mod:`~simpleaudio.functionchecks` module contains a number of classes 
+The :mod:`~simpleaudio-hamilton-cs.functionchecks` module contains a number of classes 
 that all inherit from :class:`FunctionCheckBase` which provides 
 :meth:`~FunctionCheckBase.run()` class method common toall function checks. 
 These may be run individually with :meth:`~FunctionCheckBase.run()`
@@ -74,12 +74,12 @@ Examples
 
 Run all checks::
 
-   import simpleaudio.functionchecks as fc
+   import simpleaudio-hamilton-cs.functionchecks as fc
 
    fc.run_all()
 
 Run a single check::
 
-   import simpleaudio.functionchecks as fc
+   import simpleaudio-hamilton-cs.functionchecks as fc
 
    fc.LeftRightCheck.run()

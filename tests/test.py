@@ -1,9 +1,9 @@
-import simpleaudio as sa
+import simpleaudio-hamilton-cs as sa
 
 import unittest
 
 
-class TestSimpleaudio(unittest.TestCase):
+class Testsimpleaudio-hamilton-cs(unittest.TestCase):
 
     def test_num_channels(self):
         self.assertRaises(ValueError, sa.play_buffer, b'\0' * 16, 0, 2, 44100)

@@ -1,12 +1,15 @@
-NOTE: THIS PROJECT IS ARCHIVED
+NOTE: THIS PROJECT IS NOT CONSISTENTLY MAINTAINED
 ==============================
 
-I no longer have the time to dedicate to maintaining Simpleaudio (which at this point is mostly keeping CI builds working). 
-This project should be considered archived, meaning that there will be no further updates or builds. 
-For anyone seriously interested in taking over the project, I would be willing to help in that process. 
-I would also be willing to revisit maintaining the library should anyone wish to sponsor it. 
+ This version of the simpleaduio library has replaced the continuous integration pipeline to
+ support more recent versions of various operating systems. We have worked on this as part
+ of a senior capstone project, and will therefore no longer be actively maintining it after
+ December 2025.
 
-Simpleaudio Package
+ This version of the package is optimized for Mac, Windows and Linux for Python versions 3.10,
+ 3.11, and 3.12.
+
+simpleaudio-hamilton-cs Package
 ===================
 
 The simplaudio package provides cross-platform, dependency-free audio playback
@@ -14,16 +17,20 @@ capability for Python 3 on OSX, Windows, and Linux.
 
 MIT Licensed.
 
-`Documentation at RTFD <http://simpleaudio.readthedocs.io/>`_
+`Documentation at RTFD <http://simpleaudio-hamilton-cs.readthedocs.io/>`_
 --------------------------------------------------------------
 
 Installation
 ------------
 
+This project is currently a work in progress, and can therefore be
+installed through TestPyPI. This will be updated upon release when
+the project is uploaded to PyPI.
+
 Installation (make sure the ``pip`` command is the right one for
 your platform and Python version)::
 
-   pip install simpleaudio
+   pip install -i https://test.pypi.org/simple/simpleaudio-hamilton-cs==1.0.6
 
 See documentation for additional installation information.
 
@@ -32,7 +39,7 @@ Quick Function Check
 
 .. code-block:: python
 
-   import simpleaudio.functionchecks as fc
+   import simpleaudio-hamilton-cs.functionchecks as fc
 
    fc.LeftRightCheck.run()
 
@@ -43,7 +50,7 @@ Simple Example
 
 .. code-block:: python
 
-   import simpleaudio as sa
+   import simpleaudio-hamilton-cs as sa
 
    wave_obj = sa.WaveObject.from_wave_file("path/to/file.wav")
    play_obj = wave_obj.play()
@@ -55,7 +62,7 @@ Support
 For usage and how-to questions, first checkout the tutorial in the
 documentation. If you're still stuck, post a question on
 `StackOverflow <http://stackoverflow.com/>`_
-and **tag it 'pysimpleaudio'**.
+and **tag it 'pysimpleaudio-hamilton-cs'**.
 
 For bug reports, please create an
 `issue on Github <https://github.com/hamiltron/py-simple-audio/issues>`_

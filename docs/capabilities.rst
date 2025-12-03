@@ -32,7 +32,7 @@ before playback.
 Audio Formats
 -------------
 
-Simpleaudio supports standard integer 8-, 16-, and 24-bit integer formats, as well as 32-bit floating point.
+simpleaudio-hamilton-cs supports standard integer 8-, 16-, and 24-bit integer formats, as well as 32-bit floating point.
 8-bit is unsigned. 16-bit and 24-bit are signed little-endian. 24-bit is three bytes per sample packed - i.e. each
 sample is three bytes followed immediately by the next three-byte sample, *without* any padding byte to align
 to a 4-byte word boundary). 32-bit is little-endian floating point.
@@ -47,8 +47,8 @@ Comparison to PyAudio
 ---------------------
 
 `PyAudio <https://pypi.python.org/pypi/PyAudio>`_ is another cross-platform
-audio library for Python. While it has more capability than simpleaudio,
+audio library for Python. While it has more capability than simpleaudio-hamilton-cs,
 such as recording and continuous audio streaming, it depends on having
 `PortAudio <http://www.portaudio.com/>`_ which makes for a more complicated
-installation. Simpleaudio is intended to be one-stop shopping for a
+installation. simpleaudio-hamilton-cs is intended to be one-stop shopping for a
 cross-platform audio interface intended for sound clip playback.

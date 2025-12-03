@@ -1,4 +1,4 @@
-import simpleaudio as sa
+import simpleaudio-hamilton-cs as sa
 
 import os
 from time import sleep

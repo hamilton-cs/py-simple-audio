@@ -1,10 +1,10 @@
 /*
-Simpleaudio Python Extension
+simpleaudio-hamilton-cs Python Extension
 Copyright (C) 2015, Joe Hamilton
 MIT License (see LICENSE.txt)
 */
 
-#include "simpleaudio.h"
+#include "simpleaudio-hamilton-cs.h"
 #include <AudioToolbox/AudioToolbox.h>
 
 /* this should be replaced by whatever constant Apple has designated */

@@ -1,8 +1,8 @@
-# Simpleaudio Python Extension
+# simpleaudio-hamilton-cs Python Extension
 # Copyright (C) 2015, Joe Hamilton
 # MIT License (see LICENSE.txt)
 
-import simpleaudio._simpleaudio as _sa
+import simpleaudio-hamilton-cs._simpleaudio-hamilton-cs as _sa
 from time import sleep
 import wave
 
