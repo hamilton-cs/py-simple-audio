@@ -101,7 +101,7 @@ jobs:
 
 
   # --- Deploy to TestPyPI job ---
-  deploy-to-testpypi:
+  deploy-to-pypi:
     docker:
       - image: cimg/python:3.12  # stable version
     resource_class: medium
@@ -153,11 +153,11 @@ workflows:
             parameters:
               python-version: ["3.10", "3.11", "3.12"]
 
-      - deploy-to-testpypi:
+      - deploy-to-pypi:
           requires:
             - build-and-test-linux
             - build-and-test-macos
             - build-and-test-windows
           filters:
             branches:
-              only: main
+              only: master
