@@ -23,7 +23,7 @@ Upgrade pip and setuptools::
 
 Install with::
 
-   pip install simpleaudio-hamilton-cs
+   pip install simpleaudiohamiltoncs
 
 Linux Dependencies
 ------------------

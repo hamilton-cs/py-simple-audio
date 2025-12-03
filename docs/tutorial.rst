@@ -4,22 +4,22 @@ Short Tutorial
 Import
 ------
 
-Import the :mod:`simpleaudio-hamilton-cs` module::
+Import the :mod:`simpleaudiohamiltoncs` module::
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
 Playing audio directly
 ----------------------
 
-The simplest way to play audio is with :func:`~simpleaudio-hamilton-cs.play_buffer`. The
+The simplest way to play audio is with :func:`~simpleaudiohamiltoncs.play_buffer`. The
 ``audio_data`` parameter must be an object which supports the buffer interface.
 (:class:`bytes` objects, Python arrays, and Numpy arrays all qualify.)::
 
    play_obj = sa.play_buffer(audio_data, 2, 2, 44100)
 
-The `play_obj` object is an instance of :class:`~simpleaudio-hamilton-cs.PlayObject`
+The `play_obj` object is an instance of :class:`~simpleaudiohamiltoncs.PlayObject`
 which could be viewed as a 'handle' to the audio playback initiated by the
-:func:`~simpleaudio-hamilton-cs.play_buffer` call. This can be used to stop playback
+:func:`~simpleaudiohamiltoncs.play_buffer` call. This can be used to stop playback
 of the audio clip::
 
    play_obj.stop()
@@ -40,16 +40,16 @@ useful when a script or program would otherwise exit before playback is done
 WaveObject's
 ------------
 
-In order to facilitate cleaner code, the :class:`~simpleaudio-hamilton-cs.WaveObject`
+In order to facilitate cleaner code, the :class:`~simpleaudiohamiltoncs.WaveObject`
 class is provided which stores a reference to the object containing the
 audio as well as a copy of the playback parameters. These can be instantiated
 like so::
 
    wave_obj = sa.WaveObject(audio_data, 2, 2, 44100)
 
-Playback is started with :meth:`~simpleaudio-hamilton-cs.WaveObject.play` and a
-:class:`~simpleaudio-hamilton-cs.PlayObject` is returned as
-with :func:`~simpleaudio-hamilton-cs.play_buffer`::
+Playback is started with :meth:`~simpleaudiohamiltoncs.WaveObject.play` and a
+:class:`~simpleaudiohamiltoncs.PlayObject` is returned as
+with :func:`~simpleaudiohamiltoncs.play_buffer`::
 
    play_obj = wave_obj.play()
 
@@ -85,7 +85,7 @@ this should always be done *after* normalization or other amplitude changes)::
 Here is a full example that plays a few sinewave notes in succession::
 
    import numpy as np
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
    # calculate note frequencies
    A_freq = 440
@@ -126,7 +126,7 @@ just as if it were played in mono. If the proportions vary between the two chann
 in one speaker than the other, 'panning' it to one side or the other. The full example below demonstrates this::
 
    import numpy as np
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
    # calculate note frequencies
    A_freq = 440
@@ -173,7 +173,7 @@ algorithm is demonstrated below, converting an array of 32-bit integers into a :
 the packed 24-bit audio to be played::
 
    import numpy as np
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
    # calculate note frequencies
    A_freq = 440

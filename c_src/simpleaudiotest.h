@@ -1,5 +1,5 @@
 /* 
-simpleaudio-hamilton-cs Python Extension
+simpleaudiohamiltoncs Python Extension
 Copyright (C) 2015, Joe Hamilton 
 MIT License (see LICENSE.txt)
 */

@@ -1,7 +1,7 @@
-:mod:`simpleaudio-hamilton-cs`
+:mod:`simpleaudiohamiltoncs`
 ==================
 
-.. module:: simpleaudio-hamilton-cs
+.. module:: simpleaudiohamiltoncs
 
 API
 ---
@@ -78,7 +78,7 @@ Examples
 
 Playing a file::
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
    wave_obj = sa.WaveObject.from_wave_file(path_to_file)
    play_obj = wave_obj.play()
@@ -86,7 +86,7 @@ Playing a file::
 
 Playing a Wave_read object::
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
    import wave
 
    wave_read = wave.open(path_to_file, 'rb')
@@ -96,7 +96,7 @@ Playing a Wave_read object::
 
 Playing an object supporting the buffer interface::
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
    import wave
 
    wave_read = wave.open(path_to_file, 'rb')
@@ -111,7 +111,7 @@ Playing an object supporting the buffer interface::
 
 Play an object directly (without creating a :class:`WaveObject`)::
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
    import wave
 
    wave_read = wave.open(path_to_file, 'rb')

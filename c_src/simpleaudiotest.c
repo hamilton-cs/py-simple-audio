@@ -1,10 +1,10 @@
 /*
-simpleaudio-hamilton-cs Python Extension
+simpleaudiohamiltoncs Python Extension
 Copyright (C) 2015, Joe Hamilton
 MIT License (see LICENSE.txt)
 */
 
-#include "simpleaudio-hamilton-cs.h"
+#include "simpleaudiohamiltoncs.h"
 
 PyObject* sa_python_error;
 
@@ -167,7 +167,7 @@ static PyObject* _play_buffer(PyObject *self, PyObject *args)
     return play_os(buffer_obj, num_samples, num_channels, bytes_per_channel, sample_rate, &play_list_head, SA_LATENCY_US);
 }
 
-static PyMethodDef _simpleaudio-hamilton-cs_methods[] = {
+static PyMethodDef _simpleaudiohamiltoncs_methods[] = {
     {"_play_buffer",  _play_buffer, METH_VARARGS, "Play audio from an object supporting the buffer interface."},
     {"_stop",  _stop, METH_VARARGS, "Stop playback of a specified audio object."},
     {"_stop_all",  _stop_all, METH_NOARGS, "Stop playback of all audio objects."},
@@ -175,29 +175,29 @@ static PyMethodDef _simpleaudio-hamilton-cs_methods[] = {
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
-static char doc_string [] = "_simpleaudio-hamilton-cs is the module containing the C-extension that handles the low-level OS-specific API interactions for audio playback.";
+static char doc_string [] = "_simpleaudiohamiltoncs is the module containing the C-extension that handles the low-level OS-specific API interactions for audio playback.";
 
-static struct PyModuleDef _simpleaudio-hamilton-cs_module = {
+static struct PyModuleDef _simpleaudiohamiltoncs_module = {
    PyModuleDef_HEAD_INIT,
-   "_simpleaudio-hamilton-cs",   /* name of module */
+   "_simpleaudiohamiltoncs",   /* name of module */
    doc_string,       /* module documentation, may be NULL */
    -1,               /* size of per-interpreter state of the module,
                         or -1 if the module keeps state in global variables. */
-   _simpleaudio-hamilton-cs_methods
+   _simpleaudiohamiltoncs_methods
 };
 
 PyMODINIT_FUNC
-PyInit__simpleaudio-hamilton-cs(void)
+PyInit__simpleaudiohamiltoncs(void)
 {
     PyObject *m;
 
-    m = PyModule_Create(&_simpleaudio-hamilton-cs_module);
+    m = PyModule_Create(&_simpleaudiohamiltoncs_module);
     if (m == NULL)
         return NULL;
 
-    sa_python_error = PyErr_NewException("_simpleaudio-hamilton-cs.simpleaudio-hamilton-csError", NULL, NULL);
+    sa_python_error = PyErr_NewException("_simpleaudiohamiltoncs.simpleaudiohamiltoncsError", NULL, NULL);
     Py_INCREF(sa_python_error);
-    PyModule_AddObject(m, "simpleaudio-hamilton-csError", sa_python_error);
+    PyModule_AddObject(m, "simpleaudiohamiltoncsError", sa_python_error);
 
     /* initialize the list head mutex */
     play_list_head.mutex = create_mutex();

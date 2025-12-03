@@ -1,4 +1,4 @@
-# simpleaudio-hamilton-cs Python Extension
+# simpleaudiohamiltoncs Python Extension
 # Copyright (C) 2015, Joe Hamilton
 # MIT License (see LICENSE.txt)
 
@@ -12,22 +12,22 @@ platform_link_args = []
 platform_compile_args = []
 
 if sys.platform == 'darwin':
-    platform_sources = ['c_src/simpleaudio-hamilton-cs_mac.c', 'c_src/posix_mutex.c']
+    platform_sources = ['c_src/simpleaudiohamiltoncs_mac.c', 'c_src/posix_mutex.c']
     platform_link_args = ['-framework', 'AudioToolbox']
     platform_compile_args = ['-mmacosx-version-min=10.6']
 elif sys.platform.startswith("linux"):
-    platform_sources = ['c_src/simpleaudio-hamilton-cs_alsa.c', 'c_src/posix_mutex.c']
+    platform_sources = ['c_src/simpleaudiohamiltoncs_alsa.c', 'c_src/posix_mutex.c']
     platform_libs = ['asound']
 elif sys.platform == 'win32':
-    platform_sources = ['c_src/simpleaudio-hamilton-cs_win.c', 'c_src/windows_mutex.c']
+    platform_sources = ['c_src/simpleaudiohamiltoncs_win.c', 'c_src/windows_mutex.c']
     platform_libs = ['Winmm', 'User32']
 else:
     pass
     # define a compiler macro for unsupported ?
 
-simpleaudio-hamilton-cs_c_ext = Extension(
-    'simpleaudio-hamilton-cs._simpleaudio-hamilton-cs',
-    sources=platform_sources + ['c_src/simpleaudio-hamilton-cs.c'],
+simpleaudiohamiltoncs_c_ext = Extension(
+    'simpleaudiohamiltoncs._simpleaudiohamiltoncs',
+    sources=platform_sources + ['c_src/simpleaudiohamiltoncs.c'],
     libraries=platform_libs,
     extra_compile_args=platform_compile_args,
     extra_link_args=platform_link_args,
@@ -43,7 +43,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.rst'),
     long_description = f.read()
 
 setup(
-    name='simpleaudio-hamilton-cs',
+    name='simpleaudiohamiltoncs',
     version=VERSION,
     license='MIT',
     description="Simple, asynchronous audio playback for Python 3.",
@@ -61,11 +61,11 @@ setup(
                  'Operating System :: POSIX :: Linux',
                  'Operating System :: Microsoft :: Windows',
                  'Operating System :: MacOS :: MacOS X'],
-    py_modules=["simpleaudio-hamilton-cs.shiny", "simpleaudio-hamilton-cs.functionchecks"],
-    ext_modules=[simpleaudio-hamilton-cs_c_ext],
-    packages=['simpleaudio-hamilton-cs'],
-    package_dir={'simpleaudio-hamilton-cs': 'simpleaudio-hamilton-cs'},
-    package_data={'simpleaudio-hamilton-cs': ['test_audio/c.wav', 'test_audio/e.wav',
+    py_modules=["simpleaudiohamiltoncs.shiny", "simpleaudiohamiltoncs.functionchecks"],
+    ext_modules=[simpleaudiohamiltoncs_c_ext],
+    packages=['simpleaudiohamiltoncs'],
+    package_dir={'simpleaudiohamiltoncs': 'simpleaudiohamiltoncs'},
+    package_data={'simpleaudiohamiltoncs': ['test_audio/c.wav', 'test_audio/e.wav',
                                   'test_audio/g.wav',
                                   'test_audio/left_right.wav',
                                   'test_audio/notes_2_16_44.wav']},)

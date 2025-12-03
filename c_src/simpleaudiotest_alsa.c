@@ -1,10 +1,10 @@
 /*
-simpleaudio-hamilton-cs Python Extension
+simpleaudiohamiltoncs Python Extension
 Copyright (C) 2015, Joe Hamilton
 MIT License (see LICENSE.txt)
 */
 
-#include "simpleaudio-hamilton-cs.h"
+#include "simpleaudiohamiltoncs.h"
 #include <alsa/asoundlib.h>
 #include <pthread.h>
 #include <unistd.h>

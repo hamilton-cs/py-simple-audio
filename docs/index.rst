@@ -1,4 +1,4 @@
-simpleaudio-hamilton-cs Package
+simpleaudiohamiltoncs Package
 ===================
 
 The simplaudio package provides cross-platform, dependency-free audio playback
@@ -14,7 +14,7 @@ Quick Function Check
 
 .. code-block:: python
 
-   import simpleaudio-hamilton-cs.functionchecks as fc
+   import simpleaudiohamiltoncs.functionchecks as fc
 
    fc.LeftRightCheck.run()
 
@@ -25,7 +25,7 @@ Simple Example
 
 .. code-block:: python
 
-   import simpleaudio-hamilton-cs as sa
+   import simpleaudiohamiltoncs as sa
 
    wave_obj = sa.WaveObject.from_wave_file("path/to/file.wav")
    play_obj = wave_obj.play()
@@ -40,6 +40,6 @@ Contents
    installation
    capabilities
    tutorial
-   simpleaudio-hamilton-cs
+   simpleaudiohamiltoncs
    functionchecks
    releases
