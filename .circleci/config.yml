@@ -1,128 +1,122 @@
-# CI Pipeline
-
 version: 2.1
 
 jobs:
-  # --- macOS build/test ---
-  build-and-test-macos:
-    parameters:
-      python-version:
-        type: string
-      apple-chip:
-        type: string
-        default: "m1.medium.gen1"
-    macos:
-      xcode: 26.0
-    resource_class: macos.<< parameters.apple-chip >>
-    steps:
-      - checkout
-
-      - run:
-          name: Install Python << parameters.python-version >>
-          command: |
-            brew install python@<< parameters.python-version >> || true
-            echo 'export PATH="/opt/homebrew/opt/python@<< parameters.python-version >>/bin:$PATH"' >> $BASH_ENV
-
-      - run:
-          name: Install Dependencies
-          command: |
-            python3 -m pip install --upgrade pip setuptools wheel
-            if [ -f requirements.txt ]; then
-              python3 -m pip install -r requirements.txt
-            fi
-            python3 -m pip install -e .
-
-      - run:
-          name: Run Unit Tests
-          command: python3 -m unittest discover
-
-
-  # --- Linux build/test ---
-  build-and-test-linux:
-    parameters:
-      python-version:
-        type: string
+  # --- Build Wheels: Linux ---
+  build-wheels-linux:
     docker:
-      - image: cimg/python:<< parameters.python-version >>
+      - image: cimg/python:3.12
     resource_class: medium
+    environment:
+      # Build for Python 3.10, 3.11, 3.12 (CPython)
+      CIBW_BUILD: "cp310-* cp311-* cp312-*"
+      # Skip 32-bit builds (optional, usually safe to skip nowadays)
+      CIBW_SKIP: "*-manylinux_i686"
+      # IMPORTANT: Install ALSA dev headers inside the manylinux container before building
+      # manylinux2014 uses yum (CentOS based)
+      CIBW_BEFORE_ALL_LINUX: "yum install -y alsa-lib-devel"
+      # Run your unit tests against the installed wheel
+      CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests" 
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+      
+      - run:
+          name: Install cibuildwheel
+          command: pip install cibuildwheel
 
       - run:
-          name: Install ALSA dev libraries
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y libasound2-dev
+          name: Build Wheels
+          command: cibuildwheel --output-dir dist
+
+      # Build the source distribution (tar.gz) on Linux only
+      - run:
+          name: Build Source Distribution
+          command: python setup.py sdist --dist-dir dist
+
+      - store_artifacts:
+          path: dist
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  # --- Build Wheels: macOS ---
+  build-wheels-macos:
+    macos:
+      xcode: 15.0 # Newer Xcode for better compatibility
+    resource_class: macos.m1.medium.gen1
+    environment:
+      CIBW_BUILD: "cp310-* cp311-* cp312-*"
+      CIBW_ARCHS_MACOS: "x86_64 arm64" # Build for Intel and Apple Silicon
+      CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests"
+    steps:
+      - checkout
+      
+      - run:
+          name: Install cibuildwheel
+          command: pip3 install cibuildwheel
 
       - run:
-          name: Install Dependencies
-          command: |
-            python -m pip install --upgrade pip setuptools wheel
-            if [ -f requirements.txt ]; then
-              python -m pip install -r requirements.txt
-            fi
-            python -m pip install -e .
+          name: Build Wheels
+          command: cibuildwheel --output-dir dist
 
-      - run:
-          name: Run Unit Tests
-          command: python -m unittest discover
+      - store_artifacts:
+          path: dist
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
 
-  # --- Windows build/test ---
-  build-and-test-windows:
-    parameters:
-      python-version:
-        type: string
+  # --- Build Wheels: Windows ---
+  build-wheels-windows:
     machine:
       image: windows-server-2022-gui:current
     resource_class: windows.medium
     shell: powershell.exe
+    environment:
+      CIBW_BUILD: "cp310-* cp311-* cp312-*"
+      CIBW_ARCHS_WINDOWS: "AMD64"
+      CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests"
     steps:
       - checkout
 
       - run:
-          name: Set up Python << parameters.python-version >>
+          name: Install Python & cibuildwheel
           command: |
-            choco install python --version=<< parameters.python-version >> -y
+            choco install python --version=3.11.0 -y
             refreshenv
-            python -m pip install --upgrade pip setuptools wheel
+            pip install cibuildwheel
 
       - run:
-          name: Install Dependencies
-          command: |
-            if (Test-Path "requirements.txt") {
-              python -m pip install -r requirements.txt
-            }
-            python -m pip install -e .
+          name: Build Wheels
+          command: cibuildwheel --output-dir dist
 
-      - run:
-          name: Run Unit Tests
-          command: python -m unittest discover
+      - store_artifacts:
+          path: dist
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
 
-  # --- Deploy to TestPyPI job ---
+  # --- Deploy All Artifacts ---
   deploy-to-pypi:
     docker:
-      - image: cimg/python:3.12  # stable version
-    resource_class: medium
+      - image: cimg/python:3.12
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
 
       - run:
-          name: Install ALSA dev libraries
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y libasound2-dev
+          name: Install Twine
+          command: pip install twine
 
       - run:
-          name: Install packaging tools
-          command: |
-            python -m pip install --upgrade pip build twine
-
-      - run:
-          name: Build distribution files
-          command: |
-            python3 setup.py sdist
+          name: Check Dist Files
+          command: ls -l dist/
 
       - run:
           name: Upload to PyPI
@@ -131,33 +125,18 @@ jobs:
               -u "${PYPI_USERNAME}" \
               -p "${PYPI_PASSWORD}"
 
-
 workflows:
   version: 2
-  build-test-workflow:
+  build-and-publish:
     jobs:
-      - build-and-test-macos:
-          matrix:
-            parameters:
-              python-version: ["3.10", "3.11", "3.12"]
-              apple-chip:
-                - "m1.medium.gen1"
-
-      - build-and-test-linux:
-          matrix:
-            parameters:
-              python-version: ["3.10", "3.11", "3.12"]
-
-      - build-and-test-windows:
-          matrix:
-            parameters:
-              python-version: ["3.10", "3.11", "3.12"]
-
+      - build-wheels-linux
+      - build-wheels-macos
+      - build-wheels-windows
       - deploy-to-pypi:
           requires:
-            - build-and-test-linux
-            - build-and-test-macos
-            - build-and-test-windows
+            - build-wheels-linux
+            - build-wheels-macos
+            - build-wheels-windows
           filters:
             branches:
               only: master
