@@ -10,11 +10,10 @@ jobs:
       # Build for Python 3.10, 3.11, 3.12 (CPython)
       CIBW_BUILD: "cp310-* cp311-* cp312-*"
       # Skip 32-bit builds (optional, usually safe to skip nowadays)
-      CIBW_SKIP: "*-manylinux_i686"
+      CIBW_SKIP: "*-manylinux_i686 *-musllinux"
       # IMPORTANT: Install ALSA dev headers inside the manylinux container before building
       # manylinux2014 uses yum (CentOS based)
       CIBW_BEFORE_ALL_LINUX: "yum install -y alsa-lib-devel"
-      CIBW_BEFORE_ALL_LINUX_MUSLLINUX: "apk add alsa-lib-dev"
       # Run your unit tests against the installed wheel
       CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests" 
     steps:
