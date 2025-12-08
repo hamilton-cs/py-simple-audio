@@ -13,7 +13,7 @@ jobs:
       CIBW_SKIP: "*-manylinux_i686"
       # IMPORTANT: Install ALSA dev headers inside the manylinux container before building
       # manylinux2014 uses yum (CentOS based)
-      CIBW_BEFORE_ALL_LINUX: "apt-get install -y libasound2-dev"
+      CIBW_BEFORE_ALL_LINUX: "yum install -y alsa-lib-devel"
       # Run your unit tests against the installed wheel
       CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests" 
     steps:
@@ -132,10 +132,10 @@ workflows:
       - build-wheels-linux
       - build-wheels-macos
       - build-wheels-windows
-      - deploy-to-pypi:
-          requires:
-            - build-wheels-macos
-            - build-wheels-windows
-          filters:
-            branches:
-              only: master
+      # - deploy-to-pypi:
+      #     requires:
+      #       - build-wheels-macos
+      #       - build-wheels-windows
+      #     filters:
+      #       branches:
+      #         only: master
