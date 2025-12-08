@@ -13,6 +13,7 @@ jobs:
       CIBW_SKIP: "*-manylinux_i686 *-musllinux"
       # IMPORTANT: Install ALSA dev headers inside the manylinux container before building
       # manylinux2014 uses yum (CentOS based)
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BEFORE_ALL_LINUX: "yum install -y alsa-lib-devel"
       # Run your unit tests against the installed wheel
       CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests" 
