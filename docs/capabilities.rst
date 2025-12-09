@@ -14,7 +14,7 @@ Platforms
 Python
 ######
 
-Python 3.7 and up is officially supported and wheels (with pre-built binaries)
+Python 3.10-3.12 are officially supported and wheels (with pre-built binaries)
 are available for Windows and macOS. Earlier versions of Python may work as well when
 building the extension from source (as on Linux).
 

@@ -35,7 +35,7 @@ simpleaudiohamiltoncs_c_ext = Extension(
 
 # attempt to generate the version from git tag and commit
 
-VERSION = "1.0.8"
+VERSION = "1.1.0"
 
 # Get the long description from the relevant file
 with open(path.join(path.abspath(path.dirname(__file__)), 'README.rst'),
@@ -49,9 +49,9 @@ setup(
     description="Simple, asynchronous audio playback for Python 3.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author='Joe Hamilton',
-    author_email='jhamilton10@georgefox.edu',
-    url='https://github.com/hamiltron/py-simple-audio',
+    author='Joe Hamilton, Charles Beard, Lulu Ceccon',
+    author_email='hdong@hamilton.edu',
+    url='https://github.com/hamilton-cs/py-simple-audio/',
     keywords=['audio', 'wave', 'media', 'multimedia',
               'sound', 'alsa', 'coreaudio', 'winmm', 'music'],
     classifiers=['Programming Language :: Python :: 3.10',

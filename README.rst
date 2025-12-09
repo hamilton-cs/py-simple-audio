@@ -24,14 +24,14 @@ MIT Licensed.
 Installation
 ------------
 
-This project is currently a work in progress, and can therefore be
-installed through TestPyPI. This will be updated upon release when
-the project is uploaded to PyPI.
+This package is optimized to work with the IDE Thonny (https://thonny.org/).
+To install, open Thonny's package manager from the Tools dropdown menu, and search for
+'simpleaudiohamiltoncs' on PyPI; click install.
 
-Installation (make sure the ``pip`` command is the right one for
+Installation via pip (make sure the ``pip`` command is the right one for
 your platform and Python version)::
 
-   pip install -i https://test.pypi.org/simple/simpleaudiohamiltoncs==1.0.6
+   pip install simpleaudiohamiltoncs
 
 See documentation for additional installation information.
 
@@ -77,5 +77,11 @@ Jonas Kalderstam
 Christophe Gohlke
 
 Tom Christie
+
+Mitch Johnson
+
+Oluwayanmife Adeniran
+
+Dave Deeley
 
 Many others for their contributions, documentation, examples, and more.
