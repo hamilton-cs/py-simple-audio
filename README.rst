@@ -21,7 +21,8 @@ MIT Licensed.
 `Documentation at RTFD <http://simpleaudiohamiltoncs.readthedocs.io/>`_
 --------------------------------------------------------------
 
-Installation
+Installation  
+
 ------------
 
 This package is optimized to work with the IDE Thonny (https://thonny.org/).
