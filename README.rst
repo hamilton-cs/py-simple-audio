@@ -85,4 +85,4 @@ Oluwayanmife Adeniran
 
 Dave Deeley
 
-Many others for their contributions, documentation, examples, and more.
+Many others for their contributions, documentation, examples, and more. 
