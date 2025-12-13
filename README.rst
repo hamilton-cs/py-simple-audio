@@ -58,7 +58,7 @@ Simple Example
    play_obj = wave_obj.play()
    play_obj.wait_done()
 
-Supports
+Support
 -------
 
 For usage and how-to questions, first checkout the tutorial in the
