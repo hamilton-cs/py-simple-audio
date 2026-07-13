@@ -7,8 +7,8 @@ jobs:
       - image: cimg/python:3.12
     resource_class: medium
     environment:
-      # Build for Python 3.10, 3.11, 3.12 (CPython)
-      CIBW_BUILD: "cp310-* cp311-* cp312-*"
+      # Build for Python 3.10 through 3.14 (CPython)
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
       # Skip 32-bit builds (optional, usually safe to skip nowadays)
       CIBW_SKIP: "*-manylinux_i686"
       # IMPORTANT: Install ALSA dev headers inside the manylinux container before building
@@ -55,12 +55,16 @@ jobs:
       xcode: 26.0 # Newer Xcode for better compatibility
     resource_class: macos.m1.medium.gen1
     environment:
-      CIBW_BUILD: "cp310-* cp311-* cp312-*"
-      CIBW_ARCHS_MACOS: "arm64" # Build for Intel and Apple Silicon
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
+      CIBW_ARCHS_MACOS: "arm64 x86_64" # Build for both Apple Silicon and Intel Macs
       CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests"
     steps:
       - checkout
-      
+
+      - run:
+          name: Install Rosetta 2 (needed to cross-build x86_64 wheels on this arm64 runner)
+          command: softwareupdate --install-rosetta --agree-to-license
+
       - run:
           name: Install cibuildwheel
           command: pip3 install cibuildwheel
@@ -84,7 +88,7 @@ jobs:
     resource_class: windows.medium
     shell: powershell.exe
     environment:
-      CIBW_BUILD: "cp310-* cp311-* cp312-*"
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
       CIBW_ARCHS_WINDOWS: "AMD64"
       CIBW_TEST_COMMAND: "python -m unittest discover -s {project}/tests"
     steps:
