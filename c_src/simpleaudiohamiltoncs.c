@@ -219,7 +219,7 @@ void delete_list_item(play_item_t* play_item) {
         play_item->prev_item->next_item = play_item->next_item;
     }
     destroy_mutex(play_item->mutex);
-    PyMem_Free(play_item);
+    PyMem_RawFree(play_item);
 }
 
 /*********************************************/
@@ -228,7 +228,7 @@ play_item_t* new_list_item(play_item_t* list_head) {
     play_item_t* new_item;
     play_item_t* old_tail;
 
-    new_item = PyMem_Malloc(sizeof(play_item_t));
+    new_item = PyMem_RawMalloc(sizeof(play_item_t));
     new_item->next_item = NULL;
 
     old_tail = list_head;
@@ -269,13 +269,13 @@ void destroy_audio_blob(audio_blob_t* audio_blob) {
     grab_mutex(audio_blob->list_mutex);
     delete_list_item(audio_blob->play_list_item);
     release_mutex(audio_blob->list_mutex);
-    PyMem_Free(audio_blob);
+    PyMem_RawFree(audio_blob);
 }
 
 /********************************************/
 
 audio_blob_t* create_audio_blob() {
-    audio_blob_t* audio_blob = PyMem_Malloc(sizeof(audio_blob_t));
+    audio_blob_t* audio_blob = PyMem_RawMalloc(sizeof(audio_blob_t));
 
     dbg1("created audio blob at %p\n", audio_blob);
 

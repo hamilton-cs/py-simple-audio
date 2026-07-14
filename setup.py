@@ -35,7 +35,7 @@ simpleaudiohamiltoncs_c_ext = Extension(
 
 # attempt to generate the version from git tag and commit
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # Get the long description from the relevant file
 with open(path.join(path.abspath(path.dirname(__file__)), 'README.rst'),
@@ -57,6 +57,8 @@ setup(
     classifiers=['Programming Language :: Python :: 3.10',
                  'Programming Language :: Python :: 3.11',
                  'Programming Language :: Python :: 3.12',
+                 'Programming Language :: Python :: 3.13',
+                 'Programming Language :: Python :: 3.14',
                  'Topic :: Multimedia :: Sound/Audio',
                  'Operating System :: POSIX :: Linux',
                  'Operating System :: Microsoft :: Windows',
