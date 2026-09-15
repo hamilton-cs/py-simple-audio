@@ -57,8 +57,8 @@ MMRESULT fill_buffer(WAVEHDR* wave_header, audio_blob_t* audio_blob) {
         if (audio_blob->num_buffers > 0) {
             dbg2("done buffering - dellocating a buffer\n");
 
-            PyMem_Free(wave_header->lpData);
-            PyMem_Free(wave_header);
+            PyMem_RawFree(wave_header->lpData);
+            PyMem_RawFree(wave_header);
             audio_blob->num_buffers--;
         }
         if (audio_blob->num_buffers == 0) {
@@ -182,9 +182,9 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     dbg1("allocating %d buffers of %d bytes\n", NUM_BUFS, buffer_size);
 
     for (i = 0; i < NUM_BUFS; i++) {
-        temp_wave_hdr = PyMem_Malloc(sizeof(WAVEHDR));
+        temp_wave_hdr = PyMem_RawMalloc(sizeof(WAVEHDR));
         memset(temp_wave_hdr, 0, sizeof(WAVEHDR));
-        temp_wave_hdr->lpData = PyMem_Malloc(buffer_size);
+        temp_wave_hdr->lpData = PyMem_RawMalloc(buffer_size);
         temp_wave_hdr->dwBufferLength = buffer_size;
 
         result = fill_buffer(temp_wave_hdr, audio_blob);
