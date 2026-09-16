@@ -135,6 +135,7 @@ class TestEmptyBufferEdgeCase(unittest.TestCase):
     exist in play_os()'s initial buffer-priming loop
     """
 
+    @_skip_if_no_device
     def test_empty_buffer_does_not_crash(self):
         # A zero-length buffer passes _play_buffer()'s own validations
         # triggering the bug.
