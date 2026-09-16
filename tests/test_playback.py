@@ -1,23 +1,16 @@
 """
-Real-playback tests, as opposed to test.py's input-validation-only tests.
+Tests playing audio.
 
-These actually exercise the native per-platform backend end to end: buffer
+These tests exercise the native per-platform backend end to end: buffer
 allocation, the OS-specific playback API (CoreAudio / WinMM / ALSA), the
-buffer-draining callback thread, and cleanup. That is the exact code path
-the Windows PyMem_Malloc/PyMem_Free -> PyMem_RawMalloc/PyMem_RawFree fix
-touches, and where the play_os()/fill_buffer() empty-buffer double-free
-lives. test.py never calls play_buffer() with valid audio, so none of that
-was previously covered.
+buffer-draining callback thread, and cleanup.
 
-Runs unchanged on mac/windows/linux via the existing CircleCI matrix
-(.circleci/config.yml's CIBW_TEST_COMMAND runs `python -m unittest
-discover -s {project}/tests` against each platform's built wheel).
+These tests were written as regression tests for
+the PyMem_Malloc/PyMem_Free -> PyMem_RawMalloc/PyMem_RawFree fix
+and the play_os()/fill_buffer() empty-buffer double-free bug.
 
-Some CI images have no usable audio output device at all (e.g. a headless
-Linux container with no ALSA device, or a Windows Server image with no
-sound card). That is an environment limitation, not a code defect, so
-these tests skip themselves (via _skip_if_no_device) rather than fail when
-the native "failed to open audio device" error comes back.
+Note: If the CI image does not have a usable audio output device,
+the tests are skipped.
 """
 
 import math
@@ -30,21 +23,25 @@ from simpleaudiohamiltoncs._simpleaudiohamiltoncs import simpleaudiohamiltoncsEr
 
 def _generate_tone(duration_s, sample_rate=44100, freq=440,
                     num_channels=1, bytes_per_channel=2):
-    """Build a short, valid PCM sine tone as raw bytes for play_buffer()."""
+    """Build a short, valid PCM sine tone as raw bytes for play_buffer().
+
+    8-bit samples are unsigned (WAV convention); 16/24-bit are signed.
+    """
     num_samples = int(duration_s * sample_rate)
+    signed = bytes_per_channel != 1
     amplitude = 2 ** (bytes_per_channel * 8 - 1) - 1
     frames = bytearray()
     for i in range(num_samples):
-        sample = int(amplitude * 0.2 * math.sin(2 * math.pi * freq * i / sample_rate))
-        packed = sample.to_bytes(bytes_per_channel, byteorder="little", signed=True)
+        value = int(amplitude * 0.2 * math.sin(2 * math.pi * freq * i / sample_rate))
+        sample = value if signed else value + 128
+        packed = sample.to_bytes(bytes_per_channel, byteorder="little", signed=signed)
         frames += packed * num_channels
     return bytes(frames)
 
 
 def _skip_if_no_device(test_method):
     """Turn "no audio device on this machine/CI image" into a skip instead
-    of a failure, so these tests stay meaningful on machines that do have
-    a device without being flaky on ones that don't."""
+    of a failure"""
     def wrapper(self, *args, **kwargs):
         try:
             return test_method(self, *args, **kwargs)
@@ -72,15 +69,15 @@ class TestRealPlayback(unittest.TestCase):
     @_skip_if_no_device
     def test_repeated_playback_stress(self):
         """
-        Regression test for the Windows PyMem_Malloc/PyMem_Free race:
+        Regression test for the PyMem_Malloc/PyMem_Free race:
         buffers were allocated on the main thread (which holds the GIL)
         but freed on the native buffer-draining thread (which never
         acquires it), corrupting CPython's allocator under timing-
         dependent conditions. A single play() call was not a reliable
         repro; repeating play+wait many times back-to-back gives the
         race many chances to happen. A crash here kills the whole test
-        process instead of reporting a normal failure -- that itself is
-        the signal to watch for on Windows CI.
+        process instead of reporting a normal failure -- that is
+        the signal to watch for on CI.
         """
         for _ in range(50):
             playback = sa.play_buffer(self.SHORT_TONE, 1, 2, 44100)
@@ -115,36 +112,35 @@ class TestRealPlayback(unittest.TestCase):
         playback.wait_done()
         self.assertFalse(playback.is_playing())
 
+    @_skip_if_no_device
+    def test_8bit_playback(self):
+        """8-bit is unsigned, unlike every other test here."""
+        tone = _generate_tone(0.1, bytes_per_channel=1)
+        playback = sa.play_buffer(tone, 1, 1, 44100)
+        playback.wait_done()
+        self.assertFalse(playback.is_playing())
+
+    @_skip_if_no_device
+    def test_24bit_playback(self):
+        """24-bit (packed 3-byte samples) is untested elsewhere."""
+        tone = _generate_tone(0.1, bytes_per_channel=3)
+        playback = sa.play_buffer(tone, 1, 3, 44100)
+        playback.wait_done()
+        self.assertFalse(playback.is_playing())
+
 
 class TestEmptyBufferEdgeCase(unittest.TestCase):
     """
-    Targets the double-free / use-after-close bug in play_os()'s initial
-    buffer-priming loop: fill_buffer() signals "already drained and
-    cleaned up" by returning the sentinel `MMSYSERR_NOERROR - 1` (see the
-    "admitted, this is terrible" comment in simpleaudiohamiltoncs_win.c),
-    which play_os()'s `if (result != MMSYSERR_NOERROR)` check cannot
-    distinguish from a genuine WinMM failure. A zero-length buffer hits
-    this on the very first play() call, causing play_os() to re-close an
-    already-closed handle and re-free an already-freed audio_blob.
-
-    On an unpatched Windows build this can crash the interpreter instead
-    of raising cleanly, which would abort the whole test run rather than
-    report a clean failure. Leave this skipped until that fix lands, then
-    remove the skip decorator.
+    Regression test for the double-free / use-after-free bug that used to
+    exist in play_os()'s initial buffer-priming loop
     """
 
-    @unittest.skip("known double-free in play_os() on empty buffers; "
-                    "enable once fill_buffer()'s done-vs-error signal is fixed")
     def test_empty_buffer_does_not_crash(self):
-        # A zero-length buffer passes _play_buffer()'s own validation
-        # (0 % anything == 0), yielding num_samples == 0 -- the exact
-        # trigger condition for the play_os() double-free.
-        try:
-            playback = sa.play_buffer(b"", 1, 2, 44100)
-        except simpleaudiohamiltoncsError:
-            # Acceptable once fixed: a clean, real error for "nothing to play."
-            return
+        # A zero-length buffer passes _play_buffer()'s own validations
+        # triggering the bug.
+        playback = sa.play_buffer(b"", 1, 2, 44100)
         playback.wait_done()
+        self.assertFalse(playback.is_playing())
 
 
 if __name__ == "__main__":

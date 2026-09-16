@@ -23,6 +23,12 @@ enum {
     FILL_BUFFER_DONE = 2
 };
 
+/* fill_buffer()'s sentinel for "no more audio -- already closed the device
+   and destroyed audio_blob". Distinct from any real MMRESULT error so
+   callers can tell "finished cleanly" apart from "the driver failed",
+   without repeating cleanup fill_buffer already performed. */
+#define FILL_BUFFER_FINISHED ((MMRESULT)-1)
+
 
 MMRESULT fill_buffer(WAVEHDR* wave_header, audio_blob_t* audio_blob) {
     int want = wave_header->dwBufferLength;
@@ -67,8 +73,7 @@ MMRESULT fill_buffer(WAVEHDR* wave_header, audio_blob_t* audio_blob) {
             /* all done, cleanup */
             waveOutClose(audio_blob->handle);
             destroy_audio_blob(audio_blob);
-            /* admitted, this is terrible */
-            return MMSYSERR_NOERROR - 1;
+            return FILL_BUFFER_FINISHED;
         }
     }
 
@@ -120,6 +125,7 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     WAVEHDR* temp_wave_hdr;
     int buffer_size;
     int i;
+    play_id_t play_id;
 
     DBG_PLAY_OS_CALL
 
@@ -135,6 +141,11 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     grab_mutex(play_list_head->mutex);
     audio_blob->play_list_item = new_list_item(play_list_head);
     release_mutex(play_list_head->mutex);
+
+    /* captured now, since a short-enough clip can cause audio_blob (and
+       its play_list_item) to be destroyed inside the priming loop below,
+       before this play_id would otherwise be read */
+    play_id = audio_blob->play_list_item->play_id;
 
     /* windows audio device and format headers setup */
     if (bytes_per_chan < 4) {
@@ -188,6 +199,20 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
         temp_wave_hdr->dwBufferLength = buffer_size;
 
         result = fill_buffer(temp_wave_hdr, audio_blob);
+        if (result == FILL_BUFFER_FINISHED) {
+            /* The audio was short enough to finish entirely during this
+               initial priming loop. fill_buffer()
+               has already closed the device handle and destroyed audio_blob;
+               there is nothing left to clean up here, and redoing it would
+               double-close the handle and double-free audio_blob. This is
+               not a failure -- the requested audio has already
+               finished "playing", so tell the buffer thread to stop waiting
+               for driver callbacks and return the play_id captured above. */
+            dbg1("playback finished during initial buffering\n");
+
+            PostThreadMessage(thread_id, WM_QUIT, 0, 0);
+            break;
+        }
         if (result != MMSYSERR_NOERROR) {
             waveOutGetErrorText(result, sys_msg_buf, SYS_STR_LEN);
             WIN_EXCEPTION("Failed to buffer audio.", result, sys_msg_buf, err_msg_buf);
@@ -200,5 +225,5 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
         }
     }
 
-    return PyLong_FromUnsignedLongLong(audio_blob->play_list_item->play_id);
+    return PyLong_FromUnsignedLongLong(play_id);
 }

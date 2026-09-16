@@ -80,6 +80,7 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     int result;
     snd_pcm_hw_params_t* hw_params;
     snd_pcm_uframes_t buffer_frames;
+    play_id_t play_id;
 
     /* set detachable thread attribute */
     result = pthread_attr_init(&thread_attr);
@@ -123,6 +124,11 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     grab_mutex(play_list_head->mutex);
     audio_blob->play_list_item = new_list_item(play_list_head);
     release_mutex(play_list_head->mutex);
+
+    /* captured now, since a short-enough clip can cause audio_blob 
+       to be destroyed inside the priming loop below,
+       before this play_id would otherwise be read */
+    play_id = audio_blob->play_list_item->play_id;
 
     /* open access to a PCM device (blocking mode)  */
     result = snd_pcm_open((snd_pcm_t**)&audio_blob->handle, device, SND_PCM_STREAM_PLAYBACK, 0);
@@ -172,5 +178,5 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(audio_blob->play_list_item->play_id);
+    return PyLong_FromUnsignedLongLong(play_id);
 }
