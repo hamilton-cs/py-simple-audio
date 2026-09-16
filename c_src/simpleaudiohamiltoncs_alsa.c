@@ -125,7 +125,7 @@ PyObject* play_os(Py_buffer buffer_obj, int len_samples, int num_channels, int b
     audio_blob->play_list_item = new_list_item(play_list_head);
     release_mutex(play_list_head->mutex);
 
-    /* captured now, since a short-enough clip can cause audio_blob 
+    /* captured now, since a very short clip can cause audio_blob
        to be destroyed inside the priming loop below,
        before this play_id would otherwise be read */
     play_id = audio_blob->play_list_item->play_id;
