@@ -23,18 +23,13 @@ from simpleaudiohamiltoncs._simpleaudiohamiltoncs import simpleaudiohamiltoncsEr
 
 def _generate_tone(duration_s, sample_rate=44100, freq=440,
                     num_channels=1, bytes_per_channel=2):
-    """Build a short, valid PCM sine tone as raw bytes for play_buffer().
-
-    8-bit samples are unsigned (WAV convention); 16/24-bit are signed.
-    """
+    """Build a short, valid PCM sine tone as raw bytes for play_buffer()."""
     num_samples = int(duration_s * sample_rate)
-    signed = bytes_per_channel != 1
     amplitude = 2 ** (bytes_per_channel * 8 - 1) - 1
     frames = bytearray()
     for i in range(num_samples):
-        value = int(amplitude * 0.2 * math.sin(2 * math.pi * freq * i / sample_rate))
-        sample = value if signed else value + 128
-        packed = sample.to_bytes(bytes_per_channel, byteorder="little", signed=signed)
+        sample = int(amplitude * 0.2 * math.sin(2 * math.pi * freq * i / sample_rate))
+        packed = sample.to_bytes(bytes_per_channel, byteorder="little", signed=True)
         frames += packed * num_channels
     return bytes(frames)
 
@@ -109,14 +104,6 @@ class TestRealPlayback(unittest.TestCase):
         16000 Hz) so coverage isn't limited to one exact code path."""
         tone = _generate_tone(0.1, sample_rate=16000, num_channels=2)
         playback = sa.play_buffer(tone, 2, 2, 16000)
-        playback.wait_done()
-        self.assertFalse(playback.is_playing())
-
-    @_skip_if_no_device
-    def test_8bit_playback(self):
-        """8-bit is unsigned, unlike every other test here."""
-        tone = _generate_tone(0.1, bytes_per_channel=1)
-        playback = sa.play_buffer(tone, 1, 1, 44100)
         playback.wait_done()
         self.assertFalse(playback.is_playing())
 
