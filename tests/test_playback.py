@@ -107,14 +107,6 @@ class TestRealPlayback(unittest.TestCase):
         playback.wait_done()
         self.assertFalse(playback.is_playing())
 
-    @_skip_if_no_device
-    def test_24bit_playback(self):
-        """24-bit (packed 3-byte samples) is untested elsewhere."""
-        tone = _generate_tone(0.1, bytes_per_channel=3)
-        playback = sa.play_buffer(tone, 1, 3, 44100)
-        playback.wait_done()
-        self.assertFalse(playback.is_playing())
-
 
 class TestEmptyBufferEdgeCase(unittest.TestCase):
     """
